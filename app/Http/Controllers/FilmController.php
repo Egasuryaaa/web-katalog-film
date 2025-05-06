@@ -9,12 +9,36 @@ class FilmController extends Controller
 {
     public function index(Request $request)
     {
+        // Ambil daftar genre unik untuk dropdown filter
+        $genres = Film::select('genre')
+                      ->distinct()
+                      ->orderBy('genre')
+                      ->pluck('genre');
+
+        // Mulai query
         $query = Film::query();
 
-        // filter & sort sama seperti sebelumnya...
-        $films = $query->paginate(9);
+        // Filter berdasarkan genre jika ada
+        if ($request->filled('genre')) {
+            $query->where('genre', $request->genre);
+        }
 
-        return view('films.index', compact('films'));
+        // Sorting berdasarkan rating jika ada
+        if ($request->filled('sort')) {
+            if ($request->sort === 'rating_asc') {
+                $query->orderBy('rating', 'asc');
+            } elseif ($request->sort === 'rating_desc') {
+                $query->orderBy('rating', 'desc');
+            }
+        } else {
+            // Default: terbaru dulu
+            $query->orderBy('created_at', 'desc');
+        }
+
+        // Paginate dan sertakan query string supaya filter & sort tetap di URL
+        $films = $query->paginate(9)->withQueryString();
+
+        return view('films.index', compact('films', 'genres'));
     }
 
     public function show($id)
