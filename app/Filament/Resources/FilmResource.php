@@ -10,6 +10,7 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Forms\Components\FileUpload;
+use Filament\Tables\Columns\TextColumn;
 
 class FilmResource extends Resource
 {
@@ -79,11 +80,19 @@ class FilmResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('id')
-                    ->label('ID'),
+                    ->label('ID')
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('title')
-                    ->label('Title'),
+                    ->label('Title')
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('description')
-                    ->label('Description'),
+                    ->label('Description')
+                    ->wrap() // Membuat teks membungkus
+                    ->limit(100) // Bisa disesuaikan, atau dihapus kalau mau semua tampil
+                    ->tooltip(fn ($record) => $record->description)
+                    ->extraAttributes([
+                        'class' => 'text-gray-800 text-sm leading-relaxed max-w-xs'
+                    ]), // CSS tambahan
                 Tables\Columns\TextColumn::make('release_date')
                     ->date()
                     ->label('Release Date')
@@ -107,6 +116,7 @@ class FilmResource extends Resource
                     ->label('Updated At')
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
+            ->defaultSort('id')
             ->filters([
                 // Add any filters if needed
             ])
