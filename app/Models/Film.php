@@ -1,5 +1,6 @@
 <?php
 
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -20,6 +21,14 @@ class Film extends Model
         'trailer_url',
         'rating',
     ];
+
+    /**
+     * Relasi ke komentar film.
+     */
+    public function comments()
+    {
+        return $this->hasMany(\App\Models\Comment::class, 'film_id');
+    }
 
     /**
      * Accessor untuk generate URL publik poster.

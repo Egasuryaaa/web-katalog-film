@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Film;
 use Illuminate\Http\Request;
+use App\Models\Comment;
+
 
 class FilmController extends Controller
 {
@@ -41,9 +43,29 @@ class FilmController extends Controller
         return view('films.index', compact('films', 'genres'));
     }
 
+
     public function show($id)
-    {
-        $film = Film::findOrFail($id);
-        return view('films.show', compact('film'));
-    }
+{
+    $film = Film::findOrFail($id);
+    $comments = $film->comments()->latest()->get();
+    return view('films.show', compact('film', 'comments'));
+}
+
+public function storeComment(Request $request, $id)
+{
+    $request->validate([
+        'name' => 'required|max:255',
+        'email' => 'required|email',
+        'comment' => 'required',
+    ]);
+
+    Comment::create([
+        'film_id' => $id,
+        'name' => $request->name,
+        'email' => $request->email,
+        'comment' => $request->comment,
+    ]);
+
+    return redirect()->route('films.show', $id)->with('success', 'Komentar berhasil ditambahkan!');
+}
 }
