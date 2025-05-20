@@ -21,55 +21,47 @@ class FilmResource extends Resource
     {
         return $form
             ->schema([
-                // Title field
                 Forms\Components\TextInput::make('title')
                     ->required()
                     ->maxLength(255)
                     ->label('Title'),
 
-                // Description field
                 Forms\Components\Textarea::make('description')
                     ->required()
                     ->label('Description'),
 
-                // Release Date field
                 Forms\Components\DatePicker::make('release_date')
                     ->required()
                     ->label('Release Date'),
 
-                // Duration field (in minutes)
                 Forms\Components\TextInput::make('duration')
                     ->numeric()
                     ->required()
                     ->label('Duration (minutes)'),
 
-                // Genre field
                 Forms\Components\TextInput::make('genre')
                     ->required()
                     ->maxLength(100)
                     ->label('Genre'),
 
-                // Poster Image field (File upload)
                 FileUpload::make('poster')
                     ->image()
                     ->required()
                     ->disk('public')
-                    ->directory('posters') // Directory for storing the poster images
+                    ->directory('posters')
                     ->preserveFilenames()
                     ->maxSize(1024)
                     ->label('Poster Image'),
 
-                // Trailer URL field (URL input)
                 Forms\Components\TextInput::make('trailer_url')
                     ->url()
                     ->nullable()
                     ->label('Trailer URL'),
 
-                // Rating field
                 Forms\Components\TextInput::make('rating')
                     ->numeric()
                     ->nullable()
-                    ->rules('min:0', 'max:10') // Use validation rules for min/max
+                    ->rules('min:0', 'max:10')
                     ->label('Rating'),
             ]);
     }
@@ -79,11 +71,19 @@ class FilmResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('id')
-                    ->label('ID'),
+                    ->label('ID')
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('title')
-                    ->label('Title'),
+                    ->label('Title')
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('description')
-                    ->label('Description'),
+                    ->label('Description')
+                    ->limit(50)
+                    ->wrap()
+                    ->tooltip(fn ($record) => $record->description)
+                    ->extraAttributes([
+                        'style' => 'white-space: normal; overflow-wrap: break-word;',
+                    ]),
                 Tables\Columns\TextColumn::make('release_date')
                     ->date()
                     ->label('Release Date')
@@ -91,24 +91,31 @@ class FilmResource extends Resource
                 Tables\Columns\TextColumn::make('duration')
                     ->label('Duration'),
                 Tables\Columns\TextColumn::make('genre')
-                    ->label('Genre'),
+                    ->label('Genre')
+                    ->searchable(),
                 Tables\Columns\ImageColumn::make('poster')
                     ->label('Poster')
-                    ->disk('public'),
+                    ->disk('public')
+                    ->height(80)
+                    ->width(60),
                 Tables\Columns\TextColumn::make('trailer_url')
-                    ->label('Trailer URL'),
+                    ->label('Trailer URL')
+                    ->limit(30)
+                    ->url(fn ($record) => $record->trailer_url, true),
                 Tables\Columns\TextColumn::make('rating')
                     ->label('Rating')
                     ->numeric(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Created At')
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->dateTime('d-m-Y H:i'),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->label('Updated At')
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->dateTime('d-m-Y H:i'),
             ])
             ->filters([
-                // Add any filters if needed
+                // Tambahkan filter jika diperlukan
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
@@ -124,7 +131,7 @@ class FilmResource extends Resource
     public static function getRelations(): array
     {
         return [
-            // Add relations if you have any
+            // Tambahkan relasi jika ada
         ];
     }
 
