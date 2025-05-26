@@ -14,9 +14,11 @@ return new class extends Migration
             $table->string('name');
             $table->string('email');
             $table->text('comment');
+            $table->unsignedBigInteger('parent_id')->nullable(); // Menambahkan parent_id untuk reply
             $table->timestamps();
 
             $table->foreign('film_id')->references('id')->on('films')->onDelete('cascade');
+            $table->foreign('parent_id')->references('id')->on('comments')->onDelete('cascade'); // Menambahkan relasi dengan tabel comments itu sendiri
         });
     }
 

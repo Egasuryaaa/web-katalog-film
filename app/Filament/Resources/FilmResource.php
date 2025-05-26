@@ -1,9 +1,10 @@
-<?php
+<?php 
 
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\FilmResource\Pages;
 use App\Models\Film;
+use App\Models\Genre;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -37,13 +38,27 @@ class FilmResource extends Resource
                 Forms\Components\TextInput::make('duration')
                     ->numeric()
                     ->required()
-                    ->label('Duration (minutes)'),
+                    ->label('Duration (minutes)'), 
 
-                Forms\Components\TextInput::make('genre')
+                // Menambahkan kolom genre menggunakan relasi many-to-many
+                Forms\Components\MultiSelect::make('genres')
+                    ->relationship('genres', 'name') // Relasi many-to-many dengan Genre
                     ->required()
-                    ->maxLength(100)
-                    ->label('Genre'),
+                    ->label('Genres'),
 
+                // Menambahkan field untuk restriksi usia
+                Forms\Components\Select::make('age_restriction')
+                    ->options([
+                        'Semua Umur' => 'Semua Umur',
+                        'Anak-anak' => 'Anak-anak',
+                        'Remaja' => 'Remaja',
+                        'Dewasa' => 'Dewasa',
+                    ])
+                    ->default('Remaja')
+                    ->required()
+                    ->label('Age Restriction'),
+
+                // Menambahkan field untuk poster image
                 FileUpload::make('poster')
                     ->image()
                     ->required()
@@ -90,8 +105,13 @@ class FilmResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('duration')
                     ->label('Duration'),
-                Tables\Columns\TextColumn::make('genre')
-                    ->label('Genre')
+                Tables\Columns\TextColumn::make('age_restriction')
+                    ->label('Age Restriction')
+                    ->sortable(),
+                // Menampilkan genre dari relasi many-to-many
+                Tables\Columns\TextColumn::make('genres.name')
+                    ->label('Genres')
+                    ->sortable()
                     ->searchable(),
                 Tables\Columns\ImageColumn::make('poster')
                     ->label('Poster')
@@ -114,7 +134,7 @@ class FilmResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->dateTime('d-m-Y H:i'),
             ])
-            ->filters([
+            ->filters([ 
                 // Tambahkan filter jika diperlukan
             ])
             ->actions([
@@ -131,7 +151,7 @@ class FilmResource extends Resource
     public static function getRelations(): array
     {
         return [
-            // Tambahkan relasi jika ada
+            // Relasi lain jika ada
         ];
     }
 
